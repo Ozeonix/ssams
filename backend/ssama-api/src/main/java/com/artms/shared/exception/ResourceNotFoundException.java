@@ -5,7 +5,11 @@ public class ResourceNotFoundException extends RuntimeException {
         super(message);
     }
 
+    public ResourceNotFoundException(String entity, Object id) {
+        super(entity + " not found with id: " + id);
+    }
+
     public static ResourceNotFoundException of(String entity, Object id) {
-        return new ResourceNotFoundException(entity + " not found with id: " + id);
+        return new ResourceNotFoundException(entity, id);
     }
 }
