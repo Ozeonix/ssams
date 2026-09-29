@@ -70,14 +70,14 @@
 - [x] Verification.
 
 ## Results
-- [ ] Calculation engine.
-- [ ] GPA.
-- [ ] Result snapshot.
-- [ ] Approval.
-- [ ] Publication.
-- [ ] Correction.
-- [ ] Versioning.
-- [ ] Student result view.
+- [x] Calculation engine.
+- [x] GPA.
+- [x] Result snapshot.
+- [x] Approval.
+- [x] Publication.
+- [x] Correction.
+- [x] Versioning.
+- [x] Student result view.
 
 ## Documents
 - [ ] Templates.
