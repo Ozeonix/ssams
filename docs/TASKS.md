@@ -101,7 +101,7 @@
 - [x] Audit UI.
 
 ## Quality
-- [ ] Unit tests.
+- [x] Unit tests.
 - [ ] Integration tests.
 - [ ] E2E tests.
 - [ ] Security tests.
