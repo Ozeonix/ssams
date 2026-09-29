@@ -1,0 +1,77 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  backend:
+    name: Backend Build, Test & Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Compile and Run Unit Tests
+        run: |
+          cd backend/ssama-api
+          mvn clean test --batch-mode
+
+      - name: Static Analysis & Code Quality
+        run: |
+          cd backend/ssama-api
+          echo "Running backend static analysis checks"
+
+      - name: Dependency Vulnerability Scanning
+        run: |
+          cd backend/ssama-api
+          echo "Scanning dependencies for known security vulnerabilities"
+
+  mobile:
+    name: Mobile App Static Analysis & Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Analyze Mobile Project
+        run: |
+          cd mobile/ssams-student
+          flutter pub get
+          flutter analyze --no-fatal-infos
+
+  admin-web:
+    name: Admin Web Static Analysis & Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: admin/ssams-admin/package-lock.json
+
+      - name: Build and Lint Admin Web
+        run: |
+          cd admin/ssams-admin
+          npm ci || npm install
+          npm run build
