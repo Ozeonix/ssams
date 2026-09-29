@@ -101,6 +101,21 @@ services:
       retries: 5
       start_period: 45s
 
+  # ─────────────────────────────────────────
+  # ARTMS Admin Web Portal (Staging)
+  # ─────────────────────────────────────────
+  admin-web:
+    build:
+      context: ./admin/ssams-admin
+      dockerfile: Dockerfile
+    container_name: artms-staging-admin-web
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "3001:80"
+
 volumes:
   staging_postgres_data:
   staging_redis_data:

@@ -30,6 +30,8 @@ admin/ssams-admin/.dart_tool/
 admin/ssams-admin/build/
 admin/ssams-admin/.flutter-plugins
 admin/ssams-admin/.flutter-plugins-dependencies
+admin/ssams-admin/.packages
+admin/ssams-admin/pubspec.lock
 
 # ─────────────────────────────────
 # IDE
