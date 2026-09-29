@@ -1,0 +1,41 @@
+{
+  "product": "Academic Real-Time Management System (ARTMS)",
+  "requested_files": [
+    "PRD.md",
+    "SRS.md",
+    "SYSTEM_DESIGN.md",
+    "ARCHITECTURE.md",
+    "TECH_STACK.md",
+    "DATABASE_SCHEMA.md",
+    "API_SPEC.md",
+    "UI_UX_SPEC.md",
+    "USER_FLOWS.md",
+    "FEATURES.md",
+    "ROLES_PERMISSIONS.md",
+    "REALTIME_ARCHITECTURE.md",
+    "SECURITY.md",
+    "ERROR_HANDLING.md",
+    "TESTING_STRATEGY.md",
+    "TEST_CASES.md",
+    "DEPLOYMENT.md",
+    "ENVIRONMENT.md",
+    "CODING_STANDARDS.md",
+    "PROJECT_STRUCTURE.md",
+    "AGENT_RULES.md",
+    "IMPLEMENTATION_PLAN.md",
+    "TASKS.md",
+    "CHANGELOG.md"
+  ],
+  "supplementary_files": [
+    "README.md",
+    "RULES.md",
+    "AGENT_BOOTSTRAP_PROMPT.md",
+    "API_EXAMPLES.md",
+    "DATA_MIGRATION.md",
+    "GRADING_ENGINE.md",
+    "DOCUMENT_TEMPLATES.md",
+    "REFERENCE_MARKSHEET_ANALYSIS.md"
+  ],
+  "reference_images_analyzed": 4,
+  "generated_at": "2026-09-29T15:58:41.884115"
+}

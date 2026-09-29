@@ -1,0 +1,64 @@
+name: ssams_student
+description: ARTMS Student Mobile Application — Academic Real-Time Management System
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.11.5 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Navigation
+  go_router: ^14.8.1
+
+  # HTTP client
+  dio: ^5.8.0+1
+
+  # Secure token storage
+  flutter_secure_storage: ^9.2.4
+
+  # WebSocket / STOMP
+  stomp_dart_client: ^2.1.0
+
+  # JSON serialization
+  json_annotation: ^4.9.0
+
+  # Push notifications
+  firebase_core: ^3.13.1
+  firebase_messaging: ^15.2.5
+
+  # Local state persistence
+  shared_preferences: ^2.3.5
+
+  # UI utilities
+  flutter_svg: ^2.0.15
+  cached_network_image: ^3.4.1
+  intl: ^0.20.2
+
+  # Connectivity check
+  connectivity_plus: ^6.1.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Riverpod code generation
+  riverpod_generator: ^2.6.3
+  build_runner: ^2.4.15
+
+  # JSON serialization code generation
+  json_serializable: ^6.9.5
+
+  # Mocking
+  mockito: ^5.4.5
+
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true

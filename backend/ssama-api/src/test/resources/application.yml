@@ -1,0 +1,24 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  flyway:
+    enabled: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+artms:
+  jwt:
+    secret: test-secret-key-must-be-at-least-32-chars-long-123
+    access-token-expiry-minutes: 15
+    refresh-token-expiry-days: 30
+  outbox:
+    enabled: false
+
+logging:
+  level:
+    root: WARN
+    com.artms: INFO

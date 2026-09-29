@@ -1,0 +1,71 @@
+# ─────────────────────────────────
+# Java / Maven
+# ─────────────────────────────────
+backend/ssama-api/target/
+backend/ssama-api/*.iml
+backend/ssama-api/.mvn/
+**/.classpath
+**/.project
+**/.settings/
+**/*.class
+
+# ─────────────────────────────────
+# Secrets / Environment
+# ─────────────────────────────────
+.env
+.env.local
+.env.*.local
+**/.env
+
+# ─────────────────────────────────
+# Flutter / Dart
+# ─────────────────────────────────
+mobile/ssams-student/.dart_tool/
+mobile/ssams-student/build/
+mobile/ssams-student/.flutter-plugins
+mobile/ssams-student/.flutter-plugins-dependencies
+mobile/ssams-student/.packages
+mobile/ssams-student/pubspec.lock
+admin/ssams-admin/.dart_tool/
+admin/ssams-admin/build/
+admin/ssams-admin/.flutter-plugins
+admin/ssams-admin/.flutter-plugins-dependencies
+
+# ─────────────────────────────────
+# IDE
+# ─────────────────────────────────
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# ─────────────────────────────────
+# OS
+# ─────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─────────────────────────────────
+# Docker volumes (not committed)
+# ─────────────────────────────────
+# Data volumes are managed outside git
+
+# ─────────────────────────────────
+# Logs
+# ─────────────────────────────────
+*.log
+logs/
+
+# ─────────────────────────────────
+# Test coverage
+# ─────────────────────────────────
+**/target/site/
+**/target/surefire-reports/
+
+# ─────────────────────────────────
+# Node (admin web if using React/Next)
+# ─────────────────────────────────
+node_modules/
+.next/
+dist/
