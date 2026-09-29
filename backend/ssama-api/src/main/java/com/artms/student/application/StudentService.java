@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -94,5 +95,29 @@ public class StudentService {
                 null, null, null));
 
         return saved;
+    }
+
+    private final StudentGuardianRepository guardianRepository;
+
+    @Transactional
+    public StudentGuardian addGuardian(UUID studentId, AddGuardianRequest req) {
+        Student student = getById(studentId);
+
+        StudentGuardian guardian = new StudentGuardian();
+        guardian.setStudent(student);
+        guardian.setName(req.name().trim());
+        guardian.setRelationship(req.relationship());
+        guardian.setPhone(req.phone());
+        guardian.setEmail(req.email());
+        guardian.setAddress(req.address());
+        guardian.setPrimary(req.isPrimary());
+
+        return guardianRepository.save(guardian);
+    }
+
+    @Transactional(readOnly = true)
+    public List<StudentGuardian> getGuardians(UUID studentId) {
+        getById(studentId); // Verify student exists & belongs to tenant
+        return guardianRepository.findByStudentId(studentId);
     }
 }

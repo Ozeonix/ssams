@@ -33,9 +33,8 @@ public class ClassGroupService {
 
         ClassGroup group = new ClassGroup();
         group.setTenantId(tenantId);
-        group.setAcademicYear(year);
-        group.setProgram(program);
-        group.setName(req.name().trim());
+        group.setAcademicYearId(year.getId());
+        group.setProgramId(program.getId());
         group.setSection(req.section().trim());
         group.setGradeLevel(req.gradeLevel().trim());
         group.setCapacity(req.capacity() != null ? req.capacity() : 40);

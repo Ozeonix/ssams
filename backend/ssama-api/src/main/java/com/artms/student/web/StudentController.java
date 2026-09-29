@@ -54,4 +54,17 @@ public class StudentController {
             @RequestBody UpdateStudentRequest request) {
         return ResponseEntity.ok(ApiResponse.of(studentService.update(id, request)));
     }
+
+    @PostMapping("/{id}/guardians")
+    public ResponseEntity<ApiResponse<com.artms.student.domain.StudentGuardian>> addGuardian(
+            @PathVariable UUID id,
+            @Valid @RequestBody AddGuardianRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.of(studentService.addGuardian(id, request)));
+    }
+
+    @GetMapping("/{id}/guardians")
+    public ResponseEntity<ApiResponse<java.util.List<com.artms.student.domain.StudentGuardian>>> getGuardians(
+            @PathVariable UUID id) {
+        return ResponseEntity.ok(ApiResponse.of(studentService.getGuardians(id)));
+    }
 }

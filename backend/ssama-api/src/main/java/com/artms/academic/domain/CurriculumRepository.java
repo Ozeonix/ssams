@@ -19,4 +19,8 @@ public interface CurriculumRepository extends JpaRepository<Curriculum, UUID> {
     Optional<Curriculum> findByTenantIdAndProgramIdAndAcademicYearIdAndVersion(
         UUID tenantId, UUID programId, UUID academicYearId, int version
     );
+
+    Optional<Curriculum> findFirstByTenantIdAndProgramIdAndAcademicYearIdAndStatusOrderByVersionDesc(
+        UUID tenantId, UUID programId, UUID academicYearId, CurriculumStatus status
+    );
 }

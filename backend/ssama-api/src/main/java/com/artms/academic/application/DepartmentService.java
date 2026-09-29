@@ -23,7 +23,7 @@ public class DepartmentService {
     @Transactional
     public Department createDepartment(CreateDepartmentRequest req) {
         UUID tenantId = TenantContext.getTenantId();
-        if (departmentRepository.findByTenantIdAndCode(tenantId, req.code()).isPresent()) {
+        if (departmentRepository.existsByTenantIdAndCode(tenantId, req.code())) {
             throw new BusinessRuleException("DUPLICATE_CODE", "Department code already exists: " + req.code());
         }
 

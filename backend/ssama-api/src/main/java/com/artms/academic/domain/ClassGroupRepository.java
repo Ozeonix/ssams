@@ -13,5 +13,6 @@ import java.util.UUID;
 public interface ClassGroupRepository extends JpaRepository<ClassGroup, UUID> {
     List<ClassGroup> findByTenantIdAndAcademicYearIdOrderByGradeLevelAscSectionAsc(UUID tenantId, UUID academicYearId);
     Optional<ClassGroup> findByTenantIdAndId(UUID tenantId, UUID id);
+    Page<ClassGroup> findByTenantId(UUID tenantId, Pageable pageable);
     Page<ClassGroup> findByTenantIdAndAcademicYearId(UUID tenantId, UUID academicYearId, Pageable pageable);
 }
