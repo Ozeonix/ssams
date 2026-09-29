@@ -126,3 +126,12 @@
 - [ ] Zero-downtime rolling deployment script.
 - [ ] Automated database backup cron & S3 sync.
 - [ ] Disaster recovery playbook.
+
+## Database
+- [ ] Standalone migration DDL synchronization (`database/migrations/`).
+- [ ] Large-scale benchmark seed (10k+ synthetic students for load testing).
+- [ ] Higher education / semester-based synthetic institution seed.
+- [ ] Database schema drift detection script.
+- [ ] Staging database PII anonymization & masking utility.
+- [ ] Automated database maintenance script (VACUUM, REINDEX, bloat check).
+- [ ] Legacy marksheet migration CSV template & parser.
