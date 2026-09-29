@@ -80,11 +80,11 @@
 - [x] Student result view.
 
 ## Documents
-- [ ] Templates.
-- [ ] Grade sheet.
-- [ ] Transcript.
-- [ ] Certificate.
-- [ ] Verification.
+- [x] Templates.
+- [x] Grade sheet.
+- [x] Transcript.
+- [x] Certificate.
+- [x] Verification.
 
 ## Real-Time
 - [ ] Outbox.
