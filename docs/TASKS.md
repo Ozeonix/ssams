@@ -61,13 +61,13 @@
 - [ ] Alerts.
 
 ## Exams
-- [ ] Exam setup.
-- [ ] Exam subjects.
-- [ ] Component configuration.
-- [ ] Marks grid.
-- [ ] Marks validation.
-- [ ] Marks submission.
-- [ ] Verification.
+- [x] Exam setup.
+- [x] Exam subjects.
+- [x] Component configuration.
+- [x] Marks grid.
+- [x] Marks validation.
+- [x] Marks submission.
+- [x] Verification.
 
 ## Results
 - [ ] Calculation engine.
