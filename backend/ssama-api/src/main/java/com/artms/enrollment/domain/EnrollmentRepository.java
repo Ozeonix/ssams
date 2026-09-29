@@ -24,6 +24,12 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, UUID> {
         UUID tenantId, UUID studentId, UUID academicYearId
     );
 
+    Optional<Enrollment> findByTenantIdAndStudentIdAndClassGroupIdAndStatus(
+        UUID tenantId, UUID studentId, UUID classGroupId, EnrollmentStatus status
+    );
+
+    List<Enrollment> findByTenantIdAndStudentId(UUID tenantId, UUID studentId);
+
     List<Enrollment> findByTenantIdAndClassGroupIdAndAcademicYearId(
         UUID tenantId, UUID classGroupId, UUID academicYearId
     );

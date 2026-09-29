@@ -56,4 +56,18 @@ public class EnrollmentController {
             @RequestParam EnrollmentStatus status) {
         return ResponseEntity.ok(ApiResponse.of(enrollmentService.updateStatus(id, status)));
     }
+
+    @PostMapping("/promote")
+    public ResponseEntity<ApiResponse<List<EnrollmentResponse>>> promote(
+            @Valid @RequestBody PromoteStudentsRequest request) {
+        List<EnrollmentResponse> response = enrollmentService.promoteStudents(request);
+        return ResponseEntity.ok(ApiResponse.of(response));
+    }
+
+    @PostMapping("/transfer")
+    public ResponseEntity<ApiResponse<EnrollmentResponse>> transfer(
+            @Valid @RequestBody TransferStudentRequest request) {
+        EnrollmentResponse response = enrollmentService.transferStudent(request);
+        return ResponseEntity.ok(ApiResponse.of(response));
+    }
 }

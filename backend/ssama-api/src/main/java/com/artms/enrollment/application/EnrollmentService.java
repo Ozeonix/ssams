@@ -213,4 +213,120 @@ public class EnrollmentService {
         enrollment.setStatus(newStatus);
         return EnrollmentResponse.from(enrollment);
     }
+
+    @Transactional
+    public List<EnrollmentResponse> promoteStudents(PromoteStudentsRequest request) {
+        return promoteStudents(TenantContext.getTenantId(), request);
+    }
+
+    @Transactional
+    public List<EnrollmentResponse> promoteStudents(UUID tenantId, PromoteStudentsRequest request) {
+        log.info("Promoting {} students from classGroup {} to classGroup {} (academicYear {})",
+                request.studentIds().size(), request.sourceClassGroupId(), request.targetClassGroupId(), request.targetAcademicYearId());
+
+        ClassGroup targetClass = classGroupRepository.findByTenantIdAndId(tenantId, request.targetClassGroupId())
+                .orElseThrow(() -> ResourceNotFoundException.of("ClassGroup", request.targetClassGroupId()));
+
+        AcademicYear targetYear = academicYearRepository.findByTenantIdAndId(tenantId, request.targetAcademicYearId())
+                .orElseThrow(() -> ResourceNotFoundException.of("AcademicYear", request.targetAcademicYearId()));
+
+        if (!targetClass.getAcademicYearId().equals(request.targetAcademicYearId())) {
+            throw new BusinessRuleException("CLASS_GROUP_YEAR_MISMATCH",
+                    "Target class group does not belong to the target academic year");
+        }
+
+        if (targetClass.getCapacity() != null) {
+            int currentCount = enrollmentRepository.countByTenantIdAndClassGroupIdAndAcademicYearId(
+                    tenantId, targetClass.getId(), targetYear.getId());
+            if (currentCount + request.studentIds().size() > targetClass.getCapacity()) {
+                throw new BusinessRuleException("CLASS_GROUP_CAPACITY_EXCEEDED",
+                        "Target class group capacity exceeded. Available: " + (targetClass.getCapacity() - currentCount));
+            }
+        }
+
+        List<Enrollment> promotedEnrollments = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        for (UUID studentId : request.studentIds()) {
+            Student student = studentRepository.findByTenantIdAndId(tenantId, studentId)
+                    .orElseThrow(() -> ResourceNotFoundException.of("Student", studentId));
+
+            enrollmentRepository.findByTenantIdAndStudentIdAndClassGroupIdAndStatus(
+                    tenantId, studentId, request.sourceClassGroupId(), EnrollmentStatus.ACTIVE)
+                    .ifPresent(curr -> {
+                        curr.setStatus(EnrollmentStatus.COMPLETED);
+                        enrollmentRepository.save(curr);
+                    });
+
+            if (enrollmentRepository.existsByTenantIdAndStudentIdAndAcademicYearId(
+                    tenantId, studentId, targetYear.getId())) {
+                throw new BusinessRuleException("STUDENT_ALREADY_ENROLLED",
+                        "Student " + student.getAdmissionNo() + " is already enrolled in academic year: " + targetYear.getId());
+            }
+
+            Enrollment newEnrollment = new Enrollment();
+            newEnrollment.setTenantId(tenantId);
+            newEnrollment.setStudentId(studentId);
+            newEnrollment.setClassGroupId(targetClass.getId());
+            newEnrollment.setAcademicYearId(targetYear.getId());
+            newEnrollment.setStatus(EnrollmentStatus.ACTIVE);
+            newEnrollment.setEnrolledAt(today);
+
+            registerCurriculumSubjects(newEnrollment, tenantId, targetClass);
+            promotedEnrollments.add(newEnrollment);
+        }
+
+        List<Enrollment> saved = enrollmentRepository.saveAll(promotedEnrollments);
+        return saved.stream().map(EnrollmentResponse::from).toList();
+    }
+
+    @Transactional
+    public EnrollmentResponse transferStudent(TransferStudentRequest request) {
+        return transferStudent(TenantContext.getTenantId(), request);
+    }
+
+    @Transactional
+    public EnrollmentResponse transferStudent(UUID tenantId, TransferStudentRequest request) {
+        log.info("Transferring student {} to target classGroup {}", request.studentId(), request.targetClassGroupId());
+
+        Enrollment currentEnrollment = enrollmentRepository.findByTenantIdAndId(tenantId, request.currentEnrollmentId())
+                .orElseThrow(() -> ResourceNotFoundException.of("Enrollment", request.currentEnrollmentId()));
+
+        if (!currentEnrollment.getStudentId().equals(request.studentId())) {
+            throw new BusinessRuleException("STUDENT_ENROLLMENT_MISMATCH",
+                    "Enrollment does not belong to the specified student");
+        }
+
+        ClassGroup targetClass = classGroupRepository.findByTenantIdAndId(tenantId, request.targetClassGroupId())
+                .orElseThrow(() -> ResourceNotFoundException.of("ClassGroup", request.targetClassGroupId()));
+
+        if (!targetClass.getAcademicYearId().equals(currentEnrollment.getAcademicYearId())) {
+            throw new BusinessRuleException("CLASS_GROUP_YEAR_MISMATCH",
+                    "Target class group must belong to the same academic year for transfer");
+        }
+
+        if (targetClass.getCapacity() != null) {
+            int currentCount = enrollmentRepository.countByTenantIdAndClassGroupIdAndAcademicYearId(
+                    tenantId, targetClass.getId(), currentEnrollment.getAcademicYearId());
+            if (currentCount >= targetClass.getCapacity()) {
+                throw new BusinessRuleException("CLASS_GROUP_CAPACITY_EXCEEDED", "Target class group capacity reached");
+            }
+        }
+
+        currentEnrollment.setStatus(EnrollmentStatus.TRANSFERRED);
+        enrollmentRepository.save(currentEnrollment);
+
+        Enrollment newEnrollment = new Enrollment();
+        newEnrollment.setTenantId(tenantId);
+        newEnrollment.setStudentId(request.studentId());
+        newEnrollment.setClassGroupId(targetClass.getId());
+        newEnrollment.setAcademicYearId(currentEnrollment.getAcademicYearId());
+        newEnrollment.setRollNo(request.newRollNo() != null ? request.newRollNo() : currentEnrollment.getRollNo());
+        newEnrollment.setStatus(EnrollmentStatus.ACTIVE);
+        newEnrollment.setEnrolledAt(LocalDate.now());
+
+        registerCurriculumSubjects(newEnrollment, tenantId, targetClass);
+        Enrollment saved = enrollmentRepository.save(newEnrollment);
+        return EnrollmentResponse.from(saved);
+    }
 }

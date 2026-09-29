@@ -241,4 +241,65 @@ class EnrollmentServiceTest {
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessageContaining("Student is already enrolled for academic year");
     }
+
+    @Test
+    @DisplayName("Should promote students to target class and academic year")
+    void testPromoteStudents() {
+        UUID studentId = UUID.randomUUID();
+        Student student = createStudent(studentId, "ADM-PROM-1");
+        ClassGroup targetClass = createClassGroup(30);
+        UUID targetYearId = UUID.randomUUID();
+        AcademicYear targetYear = new AcademicYear();
+        targetYear.setId(targetYearId);
+        targetYear.setTenantId(tenantId);
+        targetClass.setAcademicYearId(targetYearId);
+
+        Enrollment currentEnrollment = new Enrollment();
+        currentEnrollment.setId(UUID.randomUUID());
+        currentEnrollment.setTenantId(tenantId);
+        currentEnrollment.setStudentId(studentId);
+        currentEnrollment.setClassGroupId(classGroupId);
+        currentEnrollment.setStatus(EnrollmentStatus.ACTIVE);
+
+        when(classGroupRepository.findByTenantIdAndId(tenantId, targetClass.getId())).thenReturn(Optional.of(targetClass));
+        when(academicYearRepository.findByTenantIdAndId(tenantId, targetYearId)).thenReturn(Optional.of(targetYear));
+        when(studentRepository.findByTenantIdAndId(tenantId, studentId)).thenReturn(Optional.of(student));
+        when(enrollmentRepository.findByTenantIdAndStudentIdAndClassGroupIdAndStatus(tenantId, studentId, classGroupId, EnrollmentStatus.ACTIVE))
+                .thenReturn(Optional.of(currentEnrollment));
+        when(enrollmentRepository.existsByTenantIdAndStudentIdAndAcademicYearId(tenantId, studentId, targetYearId)).thenReturn(false);
+        when(enrollmentRepository.saveAll(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        PromoteStudentsRequest req = new PromoteStudentsRequest(classGroupId, targetClass.getId(), targetYearId, List.of(studentId));
+        List<EnrollmentResponse> responses = enrollmentService.promoteStudents(tenantId, req);
+
+        assertThat(responses).hasSize(1);
+        assertThat(currentEnrollment.getStatus()).isEqualTo(EnrollmentStatus.COMPLETED);
+    }
+
+    @Test
+    @DisplayName("Should transfer student to target class within same academic year")
+    void testTransferStudent() {
+        UUID studentId = UUID.randomUUID();
+        UUID currEnrollmentId = UUID.randomUUID();
+        ClassGroup targetClass = createClassGroup(30);
+
+        Enrollment currentEnrollment = new Enrollment();
+        currentEnrollment.setId(currEnrollmentId);
+        currentEnrollment.setTenantId(tenantId);
+        currentEnrollment.setStudentId(studentId);
+        currentEnrollment.setClassGroupId(classGroupId);
+        currentEnrollment.setAcademicYearId(academicYearId);
+        currentEnrollment.setStatus(EnrollmentStatus.ACTIVE);
+        currentEnrollment.setRollNo("OLD-ROLL");
+
+        when(enrollmentRepository.findByTenantIdAndId(tenantId, currEnrollmentId)).thenReturn(Optional.of(currentEnrollment));
+        when(classGroupRepository.findByTenantIdAndId(tenantId, targetClass.getId())).thenReturn(Optional.of(targetClass));
+        when(enrollmentRepository.save(any(Enrollment.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        TransferStudentRequest req = new TransferStudentRequest(studentId, currEnrollmentId, targetClass.getId(), "Family relocation", "NEW-ROLL");
+        EnrollmentResponse res = enrollmentService.transferStudent(tenantId, req);
+
+        assertThat(res).isNotNull();
+        assertThat(currentEnrollment.getStatus()).isEqualTo(EnrollmentStatus.TRANSFERRED);
+    }
 }

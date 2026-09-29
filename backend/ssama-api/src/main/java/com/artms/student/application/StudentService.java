@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -22,6 +23,52 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
     private final AuditService auditService;
+
+    @Transactional
+    @PreAuthorize("hasAuthority('PERM_student:create')")
+    public BatchImportResult importStudentsBatch(List<CreateStudentRequest> requests) {
+        UUID tenantId = TenantContext.getTenantId();
+        int imported = 0;
+        int skipped = 0;
+        List<String> errors = new ArrayList<>();
+
+        for (int i = 0; i < requests.size(); i++) {
+            CreateStudentRequest req = requests.get(i);
+            try {
+                if (studentRepository.existsByTenantIdAndAdmissionNo(tenantId, req.admissionNo())) {
+                    skipped++;
+                    errors.add("Row " + (i + 1) + ": Admission number '" + req.admissionNo() + "' already exists");
+                    continue;
+                }
+
+                Student student = new Student();
+                student.setTenantId(tenantId);
+                student.setAdmissionNo(req.admissionNo());
+                student.setFirstName(req.firstName());
+                student.setMiddleName(req.middleName());
+                student.setLastName(req.lastName());
+                student.setDateOfBirth(req.dateOfBirth());
+                student.setGender(req.gender());
+                student.setPhone(req.phone());
+                student.setEmail(req.email());
+                student.setAddress(req.address());
+                student.setRegistrationNo(req.registrationNo());
+                student.setSymbolNo(req.symbolNo());
+
+                studentRepository.save(student);
+                imported++;
+            } catch (Exception ex) {
+                skipped++;
+                errors.add("Row " + (i + 1) + " (" + req.admissionNo() + "): " + ex.getMessage());
+            }
+        }
+
+        auditService.record(tenantId, TenantContext.getUserId(),
+                "student.batch_imported", "Student", "BATCH",
+                Map.of("total", requests.size(), "imported", imported, "skipped", skipped));
+
+        return new BatchImportResult(requests.size(), imported, skipped, errors);
+    }
 
     @Transactional
     @PreAuthorize("hasAuthority('PERM_student:create')")

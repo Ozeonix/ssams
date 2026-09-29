@@ -43,6 +43,13 @@ public class StudentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.of(student));
     }
 
+    @PostMapping("/import")
+    public ResponseEntity<ApiResponse<BatchImportResult>> importStudents(
+            @Valid @RequestBody java.util.List<CreateStudentRequest> requests) {
+        BatchImportResult result = studentService.importStudentsBatch(requests);
+        return ResponseEntity.ok(ApiResponse.of(result));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Student>> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.of(studentService.getById(id)));
