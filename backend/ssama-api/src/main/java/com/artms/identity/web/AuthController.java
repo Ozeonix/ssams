@@ -52,6 +52,45 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<java.util.Map<String, String>>> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request) {
+        String token = authService.initiatePasswordReset(request);
+        return ResponseEntity.ok(ApiResponse.of(java.util.Map.of(
+                "message", "Password reset instructions sent",
+                "resetToken", token // provided for immediate client use or email workflow
+        )));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<java.util.Map<String, String>>> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok(ApiResponse.of(java.util.Map.of("message", "Password has been successfully reset")));
+    }
+
+    @GetMapping("/sessions")
+    public ResponseEntity<ApiResponse<java.util.List<SessionResponse>>> getSessions(
+            @AuthenticationPrincipal ArtmsPrincipal principal) {
+        java.util.List<SessionResponse> sessions = authService.listSessions(principal.getUserId(), principal.getTenantId());
+        return ResponseEntity.ok(ApiResponse.of(sessions));
+    }
+
+    @DeleteMapping("/sessions/{sessionId}")
+    public ResponseEntity<Void> revokeSession(
+            @PathVariable java.util.UUID sessionId,
+            @AuthenticationPrincipal ArtmsPrincipal principal) {
+        authService.revokeSession(sessionId, principal.getUserId(), principal.getTenantId());
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/sessions")
+    public ResponseEntity<Void> revokeAllSessions(
+            @AuthenticationPrincipal ArtmsPrincipal principal) {
+        authService.revokeAllSessions(principal.getUserId(), principal.getTenantId());
+        return ResponseEntity.noContent().build();
+    }
+
     private String resolveClientIp(HttpServletRequest request) {
         String xForwardedFor = request.getHeader("X-Forwarded-For");
         if (xForwardedFor != null && !xForwardedFor.isBlank()) {

@@ -46,6 +46,8 @@ public class SecurityConfig {
                 // Public endpoints
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/refresh").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/forgot-password").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/reset-password").permitAll()
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                 .requestMatchers("/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/api/v1/documents/verify/**").permitAll()

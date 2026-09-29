@@ -35,6 +35,7 @@ public class AuthService {
     private final UserAccountRepository userAccountRepository;
     private final UserTenantMembershipRepository membershipRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
@@ -177,6 +178,80 @@ public class AuthService {
                     refreshTokenRepository.save(rt);
                 });
         log.info("Logout: userId={}, tenantId={}", userId, tenantId);
+    }
+
+    @Transactional
+    public String initiatePasswordReset(ForgotPasswordRequest request) {
+        Tenant tenant = tenantRepository.findByCode(request.tenantCode())
+                .orElseThrow(() -> new BusinessRuleException("INVALID_REQUEST", "Invalid tenant or username"));
+
+        UserAccount user = userAccountRepository.findByTenantAndIdentifier(tenant.getId(), request.usernameOrEmail())
+                .orElseThrow(() -> new BusinessRuleException("INVALID_REQUEST", "Invalid tenant or username"));
+
+        String rawToken = UUID.randomUUID().toString();
+        String tokenHash = hashToken(rawToken);
+
+        PasswordResetToken resetToken = new PasswordResetToken();
+        resetToken.setUserId(user.getId());
+        resetToken.setTenantId(tenant.getId());
+        resetToken.setTokenHash(tokenHash);
+        resetToken.setExpiresAt(OffsetDateTime.now().plusHours(2));
+        passwordResetTokenRepository.save(resetToken);
+
+        log.info("Password reset initiated for userId={}, tenantId={}", user.getId(), tenant.getId());
+        return rawToken;
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        String tokenHash = hashToken(request.token());
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByTokenHash(tokenHash)
+                .orElseThrow(() -> new BusinessRuleException("INVALID_TOKEN", "Invalid or expired reset token"));
+
+        if (!resetToken.isValid()) {
+            throw new BusinessRuleException("TOKEN_EXPIRED", "Reset token has expired or already been used");
+        }
+
+        UserAccount user = userAccountRepository.findById(resetToken.getUserId())
+                .orElseThrow(() -> new BusinessRuleException("USER_NOT_FOUND", "User not found"));
+
+        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        user.resetFailedAttempts();
+        if (user.getStatus() == UserStatus.LOCKED) {
+            user.setStatus(UserStatus.ACTIVE);
+            user.setLockedUntil(null);
+        }
+        userAccountRepository.save(user);
+
+        resetToken.setUsedAt(OffsetDateTime.now());
+        passwordResetTokenRepository.save(resetToken);
+
+        // Revoke all existing sessions for security
+        refreshTokenRepository.revokeAllByUserAndTenant(user.getId(), resetToken.getTenantId(), OffsetDateTime.now());
+        log.info("Password reset successful for userId={}, tenantId={}", user.getId(), resetToken.getTenantId());
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.List<SessionResponse> listSessions(UUID userId, UUID tenantId) {
+        return refreshTokenRepository.findByUserIdAndTenantIdAndRevokedAtIsNullOrderByCreatedAtDesc(userId, tenantId)
+                .stream()
+                .map(SessionResponse::from)
+                .toList();
+    }
+
+    @Transactional
+    public void revokeSession(UUID sessionId, UUID userId, UUID tenantId) {
+        RefreshToken token = refreshTokenRepository.findByIdAndUserIdAndTenantId(sessionId, userId, tenantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Session not found with id: " + sessionId));
+        token.setRevokedAt(OffsetDateTime.now());
+        refreshTokenRepository.save(token);
+        log.info("Session revoked: sessionId={}, userId={}", sessionId, userId);
+    }
+
+    @Transactional
+    public void revokeAllSessions(UUID userId, UUID tenantId) {
+        refreshTokenRepository.revokeAllByUserAndTenant(userId, tenantId, OffsetDateTime.now());
+        log.info("All sessions revoked for userId={}, tenantId={}", userId, tenantId);
     }
 
     private String hashToken(String rawToken) {
