@@ -6,59 +6,59 @@
 - `[x]` completed
 
 ## Foundation
-- [ ] Initialize monorepo.
-- [ ] Configure Java 21.
-- [ ] Configure Spring Boot.
-- [ ] Configure Flutter.
-- [ ] Configure admin web.
-- [ ] Docker Compose.
-- [ ] CI pipeline.
-- [ ] Static analysis.
-- [ ] Dependency scanning.
+- [x] Initialize monorepo.
+- [x] Configure Java 21.
+- [x] Configure Spring Boot.
+- [x] Configure Flutter.
+- [x] Configure admin web.
+- [x] Docker Compose.
+- [x] CI pipeline.
+- [x] Static analysis.
+- [x] Dependency scanning.
 
 ## Identity
-- [ ] User entity.
-- [ ] Tenant entity.
-- [ ] Membership.
-- [ ] Roles.
-- [ ] Permissions.
-- [ ] Login.
-- [ ] Refresh rotation.
-- [ ] Logout/revocation.
-- [ ] Password reset.
-- [ ] MFA extension point.
-- [ ] Session/device management.
+- [x] User entity.
+- [x] Tenant entity.
+- [x] Membership.
+- [x] Roles.
+- [x] Permissions.
+- [x] Login.
+- [x] Refresh rotation.
+- [x] Logout/revocation.
+- [x] Password reset.
+- [x] MFA extension point.
+- [x] Session/device management.
 
 ## Academic
-- [ ] Academic year.
-- [ ] Terms.
-- [ ] Departments.
-- [ ] Programs.
-- [ ] Class/section.
-- [ ] Subjects.
-- [ ] Curriculum version.
-- [ ] Components.
-- [ ] Credit hours.
-- [ ] Grading scheme.
-- [ ] Grade bands.
+- [x] Academic year.
+- [x] Terms.
+- [x] Departments.
+- [x] Programs.
+- [x] Class/section.
+- [x] Subjects.
+- [x] Curriculum version.
+- [x] Components.
+- [x] Credit hours.
+- [x] Grading scheme.
+- [x] Grade bands.
 
 ## Students
-- [ ] Student CRUD.
-- [ ] Guardian.
-- [ ] Enrollment.
-- [ ] Subject enrollment.
-- [ ] Promotion.
-- [ ] Transfer.
-- [ ] Import wizard.
+- [x] Student CRUD.
+- [x] Guardian.
+- [x] Enrollment.
+- [x] Subject enrollment.
+- [x] Promotion.
+- [x] Transfer.
+- [x] Import wizard.
 
 ## Attendance
-- [ ] Session.
-- [ ] Attendance records.
-- [ ] Teacher workflow.
-- [ ] Correction.
-- [ ] Percentage.
-- [ ] Student view.
-- [ ] Alerts.
+- [x] Session.
+- [x] Attendance records.
+- [x] Teacher workflow.
+- [x] Correction.
+- [x] Percentage.
+- [x] Student view.
+- [x] Alerts.
 
 ## Exams
 - [x] Exam setup.
@@ -102,9 +102,9 @@
 
 ## Quality
 - [x] Unit tests.
-- [ ] Integration tests.
+- [x] Integration tests.
 - [ ] E2E tests.
-- [ ] Security tests.
+- [x] Security tests.
 - [ ] Load tests.
 - [ ] Backup restore test.
 - [ ] Production smoke tests.
