@@ -115,3 +115,14 @@
 - [x] Migration validation.
 - [x] Staff training.
 - [x] Production launch.
+
+## Infrastructure
+- [ ] Nginx ingress reverse proxy & SSL/TLS.
+- [ ] WebSocket upgrade configuration.
+- [ ] Ingress rate limiting.
+- [ ] Production Docker Compose with network isolation.
+- [ ] Prometheus scraping & Alertmanager rules.
+- [ ] Grafana monitoring dashboards.
+- [ ] Zero-downtime rolling deployment script.
+- [ ] Automated database backup cron & S3 sync.
+- [ ] Disaster recovery playbook.
