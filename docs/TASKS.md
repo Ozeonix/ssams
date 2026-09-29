@@ -103,15 +103,15 @@
 ## Quality
 - [x] Unit tests.
 - [x] Integration tests.
-- [ ] E2E tests.
+- [x] E2E tests.
 - [x] Security tests.
-- [ ] Load tests.
-- [ ] Backup restore test.
-- [ ] Production smoke tests.
+- [x] Load tests.
+- [x] Backup restore test.
+- [x] Production smoke tests.
 
 ## Release
-- [ ] Staging.
-- [ ] Pilot.
-- [ ] Migration validation.
-- [ ] Staff training.
-- [ ] Production launch.
+- [x] Staging.
+- [x] Pilot.
+- [x] Migration validation.
+- [x] Staff training.
+- [x] Production launch.
