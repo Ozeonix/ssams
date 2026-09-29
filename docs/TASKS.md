@@ -94,11 +94,11 @@
 - [x] Reconnect sync.
 
 ## Admin
-- [ ] Settings.
-- [ ] Branding.
-- [ ] Feature flags.
-- [ ] Permission management.
-- [ ] Audit UI.
+- [x] Settings.
+- [x] Branding.
+- [x] Feature flags.
+- [x] Permission management.
+- [x] Audit UI.
 
 ## Quality
 - [ ] Unit tests.

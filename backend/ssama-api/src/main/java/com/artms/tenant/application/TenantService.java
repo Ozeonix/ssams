@@ -52,6 +52,7 @@ public class TenantService {
         if (request.locale() != null) tenant.setLocale(request.locale());
         if (request.branding() != null) tenant.setBranding(request.branding());
         if (request.settings() != null) tenant.setSettings(request.settings());
+        if (request.modules() != null) tenant.setModules(request.modules());
         return tenantRepository.save(tenant);
     }
 

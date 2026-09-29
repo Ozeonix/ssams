@@ -7,5 +7,6 @@ public record UpdateTenantRequest(
     String timezone,
     String locale,
     Map<String, Object> branding,
-    Map<String, Object> settings
+    Map<String, Object> settings,
+    Map<String, Boolean> modules
 ) {}
