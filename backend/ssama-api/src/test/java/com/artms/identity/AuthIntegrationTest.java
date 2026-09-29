@@ -37,6 +37,9 @@ class AuthIntegrationTest extends IntegrationTestBase {
     UserTenantMembershipRepository membershipRepository;
 
     @Autowired
+    RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
     PasswordEncoder passwordEncoder;
 
     private Tenant tenantA;
@@ -47,6 +50,11 @@ class AuthIntegrationTest extends IntegrationTestBase {
     void setUp() {
         RestAssured.port = port;
         RestAssured.basePath = "/api/v1";
+
+        refreshTokenRepository.deleteAll();
+        membershipRepository.deleteAll();
+        userAccountRepository.deleteAll();
+        tenantRepository.deleteAll();
 
         // Create synthetic tenants — not real institution data
         tenantA = new Tenant();

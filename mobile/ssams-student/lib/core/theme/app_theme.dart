@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 /// ARTMS app theme — clean academic management aesthetic.
 /// Note: google_fonts package not added as dependency;
@@ -92,8 +91,8 @@ class AppTheme {
     );
   }
 
-  static CardTheme _cardTheme() {
-    return CardTheme(
+  static CardThemeData _cardTheme() {
+    return CardThemeData(
       elevation: 2,
       shadowColor: Colors.black12,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
