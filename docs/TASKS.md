@@ -117,21 +117,21 @@
 - [x] Production launch.
 
 ## Infrastructure
-- [ ] Nginx ingress reverse proxy & SSL/TLS.
-- [ ] WebSocket upgrade configuration.
-- [ ] Ingress rate limiting.
-- [ ] Production Docker Compose with network isolation.
-- [ ] Prometheus scraping & Alertmanager rules.
-- [ ] Grafana monitoring dashboards.
-- [ ] Zero-downtime rolling deployment script.
-- [ ] Automated database backup cron & S3 sync.
-- [ ] Disaster recovery playbook.
+- [x] Nginx ingress reverse proxy & SSL/TLS.
+- [x] WebSocket upgrade configuration.
+- [x] Ingress rate limiting.
+- [x] Production Docker Compose with network isolation.
+- [x] Prometheus scraping & Alertmanager rules.
+- [x] Grafana monitoring dashboards.
+- [x] Zero-downtime rolling deployment script.
+- [x] Automated database backup cron & S3 sync.
+- [x] Disaster recovery playbook.
 
 ## Database
-- [ ] Standalone migration DDL synchronization (`database/migrations/`).
-- [ ] Large-scale benchmark seed (10k+ synthetic students for load testing).
-- [ ] Higher education / semester-based synthetic institution seed.
-- [ ] Database schema drift detection script.
-- [ ] Staging database PII anonymization & masking utility.
-- [ ] Automated database maintenance script (VACUUM, REINDEX, bloat check).
-- [ ] Legacy marksheet migration CSV template & parser.
+- [x] Standalone migration DDL synchronization (`database/migrations/`).
+- [x] Large-scale benchmark seed (10k+ synthetic students for load testing).
+- [x] Higher education / semester-based synthetic institution seed.
+- [x] Database schema drift detection script.
+- [x] Staging database PII anonymization & masking utility.
+- [x] Automated database maintenance script (VACUUM, REINDEX, bloat check).
+- [x] Legacy marksheet migration CSV template & parser.

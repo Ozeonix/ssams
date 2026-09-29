@@ -1,0 +1,4 @@
+student_code,first_name,last_name,date_of_birth,gender,phone,email,guardian_name,guardian_phone,guardian_relation,admission_date,program_code,class_section,academic_year
+STU-001,Ram,Shrestha,2001-05-12,MALE,+977-9841234567,ram.shrestha@school.edu,Hari Shrestha,+977-9851234567,FATHER,2019-07-16,BSIT,BSIT-A,2019-20
+STU-002,Sita,Tamang,2002-03-22,FEMALE,+977-9812345678,sita.tamang@school.edu,Maya Tamang,+977-9862345678,MOTHER,2019-07-16,BSIT,BSIT-A,2019-20
+STU-003,Bikash,Rai,2001-11-08,MALE,+977-9823456789,bikash.rai@school.edu,Kiran Rai,+977-9873456789,FATHER,2019-07-20,BBA,BBA-A,2019-20

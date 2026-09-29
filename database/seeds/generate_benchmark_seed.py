@@ -1,0 +1,149 @@
+#!/usr/bin/env python3
+"""
+SSAMS / ARTMS – Large-Scale Benchmark Seed Generator
+=====================================================
+Generates 10,000+ synthetic student records for load testing.
+
+Usage:
+    python3 database/seeds/generate_benchmark_seed.py \
+        --students 10000 \
+        --output database/seeds/benchmark_10k_students.sql
+
+Requirements:
+    pip install faker
+
+Output SQL is idempotent – uses INSERT ON CONFLICT DO NOTHING.
+"""
+
+import argparse
+import random
+import uuid
+import sys
+from datetime import date, timedelta
+from pathlib import Path
+
+try:
+    from faker import Faker
+except ImportError:
+    print("ERROR: 'faker' not installed. Run: pip install faker")
+    sys.exit(1)
+
+fake = Faker(["en_US", "ne_NP"])
+Faker.seed(42)
+random.seed(42)
+
+# ── Fixture IDs (must match pilot_institution_seed.sql) ─────────────────────
+TENANT_ID        = "00000000-0000-0000-0000-000000000001"
+DEPT_CS_ID       = "10000000-0000-0000-0000-000000000001"
+DEPT_BM_ID       = "10000000-0000-0000-0000-000000000002"
+PROG_BSC_IT_ID   = "20000000-0000-0000-0000-000000000001"
+PROG_BBA_ID      = "20000000-0000-0000-0000-000000000002"
+ACAD_YEAR_ID     = "30000000-0000-0000-0000-000000000001"
+TERM_1_ID        = "31000000-0000-0000-0000-000000000001"
+
+GENDERS     = ["MALE", "FEMALE", "OTHER"]
+STATUSES    = ["ACTIVE"] * 90 + ["SUSPENDED"] * 3 + ["GRADUATED"] * 5 + ["WITHDRAWN"] * 2
+PROGRAMS    = [PROG_BSC_IT_ID, PROG_BBA_ID]
+DEPARTMENTS = [DEPT_CS_ID, DEPT_BM_ID]
+
+# 5 class sections per program (10 total)
+CLASS_SECTIONS = [
+    f"40000000-0000-0000-{str(i).zfill(4)}-000000000001"
+    for i in range(1, 11)
+]
+
+def random_date(start_year=1998, end_year=2004):
+    start = date(start_year, 1, 1)
+    end   = date(end_year, 12, 31)
+    delta = (end - start).days
+    return start + timedelta(days=random.randint(0, delta))
+
+def random_admission_date():
+    start = date(2018, 1, 1)
+    end   = date(2024, 12, 31)
+    delta = (end - start).days
+    return start + timedelta(days=random.randint(0, delta))
+
+def pg_str(s: str) -> str:
+    return s.replace("'", "''")
+
+def generate_student_sql(n: int, year_prefix: str = "STU") -> list[str]:
+    stmts = []
+    for i in range(1, n + 1):
+        sid          = str(uuid.uuid4())
+        program_id   = random.choice(PROGRAMS)
+        section_id   = random.choice(CLASS_SECTIONS)
+        student_code = f"{year_prefix}-{i:06d}"
+        first_name   = pg_str(fake.first_name())
+        last_name    = pg_str(fake.last_name())
+        dob          = random_date()
+        gender       = random.choice(GENDERS)
+        phone        = f"+977-98{random.randint(10000000,99999999)}"
+        email        = f"student{i}@benchmark.artms.test"
+        status       = random.choice(STATUSES)
+        admission_dt = random_admission_date()
+
+        # Student INSERT
+        stmts.append(
+            f"INSERT INTO student "
+            f"(id, tenant_id, student_code, first_name, last_name, date_of_birth, "
+            f"gender, phone, email, status, admission_date) "
+            f"VALUES ("
+            f"'{sid}', '{TENANT_ID}', '{student_code}', "
+            f"'{first_name}', '{last_name}', '{dob}', "
+            f"'{gender}', '{phone}', '{email}', "
+            f"'{status}', '{admission_dt}'"
+            f") ON CONFLICT (tenant_id, student_code) DO NOTHING;"
+        )
+
+        # Enrollment INSERT (only for ACTIVE students)
+        if status == "ACTIVE":
+            eid = str(uuid.uuid4())
+            stmts.append(
+                f"INSERT INTO enrollment "
+                f"(id, tenant_id, student_id, class_section_id, academic_year_id, term_id, status) "
+                f"VALUES ("
+                f"'{eid}', '{TENANT_ID}', '{sid}', "
+                f"'{section_id}', '{ACAD_YEAR_ID}', '{TERM_1_ID}', "
+                f"'ACTIVE'"
+                f") ON CONFLICT DO NOTHING;"
+            )
+
+        if i % 1000 == 0:
+            print(f"  Generated {i:,} / {n:,} students …", file=sys.stderr)
+
+    return stmts
+
+def main():
+    parser = argparse.ArgumentParser(description="Generate benchmark seed SQL")
+    parser.add_argument("--students", type=int, default=10000,
+                        help="Number of students to generate (default: 10000)")
+    parser.add_argument("--output", type=str,
+                        default="database/seeds/benchmark_10k_students.sql",
+                        help="Output SQL file path")
+    args = parser.parse_args()
+
+    print(f"Generating {args.students:,} synthetic students …", file=sys.stderr)
+    stmts = generate_student_sql(args.students)
+
+    output_path = Path(args.output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with output_path.open("w", encoding="utf-8") as f:
+        f.write("-- ============================================================\n")
+        f.write(f"-- ARTMS Benchmark Seed – {args.students:,} synthetic students\n")
+        f.write("-- Generated by: database/seeds/generate_benchmark_seed.py\n")
+        f.write("-- WARNING: For load testing only – do NOT run in production!\n")
+        f.write("-- ============================================================\n\n")
+        f.write("BEGIN;\n\n")
+        for stmt in stmts:
+            f.write(stmt + "\n")
+        f.write("\nCOMMIT;\n")
+        f.write(f"\n-- Total: {args.students:,} students inserted (ON CONFLICT DO NOTHING)\n")
+
+    print(f"Written to: {output_path}", file=sys.stderr)
+    print(f"Total SQL statements: {len(stmts):,}", file=sys.stderr)
+
+
+if __name__ == "__main__":
+    main()
