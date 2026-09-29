@@ -87,11 +87,11 @@
 - [x] Verification.
 
 ## Real-Time
-- [ ] Outbox.
-- [ ] WebSocket.
-- [ ] Notification service.
-- [ ] Push adapter.
-- [ ] Reconnect sync.
+- [x] Outbox.
+- [x] WebSocket.
+- [x] Notification service.
+- [x] Push adapter.
+- [x] Reconnect sync.
 
 ## Admin
 - [ ] Settings.

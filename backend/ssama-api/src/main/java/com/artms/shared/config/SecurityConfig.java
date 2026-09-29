@@ -49,6 +49,7 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                 .requestMatchers("/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/api/v1/documents/verify/**").permitAll()
+                .requestMatchers("/ws/**").permitAll()
                 // All other endpoints require authentication
                 .anyRequest().authenticated()
             )
