@@ -1,0 +1,88 @@
+spring:
+  config:
+    activate:
+      on-profile: staging
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/artms_staging}
+    username: ${DB_USERNAME:artms_staging}
+    password: ${DB_PASSWORD:artms_staging_secret}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:25}
+      minimum-idle: 10
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 1200000
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: false
+
+  flyway:
+    enabled: true
+    validate-on-migrate: true
+    baseline-on-migrate: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 3000ms
+
+server:
+  port: ${SERVER_PORT:8080}
+  forward-headers-strategy: framework
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+
+artms:
+  jwt:
+    access-token-expiry-minutes: 15
+    refresh-token-expiry-days: 7
+  storage:
+    type: ${STORAGE_TYPE:s3}
+    s3:
+      endpoint: ${S3_ENDPOINT:http://minio:9000}
+      bucket: ${S3_BUCKET:artms-staging-docs}
+      region: ${S3_REGION:us-east-1}
+      access-key: ${S3_ACCESS_KEY:minioadmin}
+      secret-key: ${S3_SECRET_KEY:minioadmin123}
+  security:
+    rate-limit:
+      enabled: true
+      login-max-attempts: 5
+      login-window-seconds: 300
+  outbox:
+    enabled: true
+    poll-delay-ms: 1000
+    batch-size: 50
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui
+    enabled: ${SWAGGER_ENABLED:true}
+
+logging:
+  level:
+    root: INFO
+    com.artms: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level [%X{requestId}] [%X{tenantId}] %logger{36} - %msg%n"

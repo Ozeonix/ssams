@@ -1,0 +1,6 @@
+admission_no,first_name,middle_name,last_name,dob,gender,phone,email,address,registration_no,symbol_no,class_level,section
+LEG-2026-001,Aarav,,Sharma,2010-04-12,MALE,+9779800000021,aarav.s@example.test,Kathmandu,REG-LEG-001,SYM-LEG-001,Grade 10,A
+LEG-2026-002,Priya,,Shrestha,2010-07-25,FEMALE,+9779800000022,priya.s@example.test,Lalitpur,REG-LEG-002,SYM-LEG-002,Grade 10,A
+LEG-2026-003,Rohan,Kumar,Poudel,2010-01-15,MALE,+9779800000023,rohan.p@example.test,Bhaktapur,REG-LEG-003,SYM-LEG-003,Grade 10,A
+LEG-2026-004,Sita,,Dahal,2010-09-08,FEMALE,+9779800000024,sita.d@example.test,Kathmandu,REG-LEG-004,SYM-LEG-004,Grade 10,A
+LEG-2026-005,Anish,,Tamang,2010-11-30,MALE,+9779800000025,anish.t@example.test,Kathmandu,REG-LEG-005,SYM-LEG-005,Grade 10,A

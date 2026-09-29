@@ -1,0 +1,111 @@
+version: "3.9"
+
+services:
+  # ─────────────────────────────────────────
+  # PostgreSQL (Staging)
+  # ─────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: artms-staging-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: artms_staging
+      POSTGRES_USER: artms_staging
+      POSTGRES_PASSWORD: artms_staging_secret
+    ports:
+      - "5433:5432"
+    volumes:
+      - staging_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U artms_staging -d artms_staging"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────
+  # Redis (Staging)
+  # ─────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: artms-staging-redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6380:6379"
+    volumes:
+      - staging_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────
+  # MinIO (Staging S3 Storage)
+  # ─────────────────────────────────────────
+  minio:
+    image: minio/minio:latest
+    container_name: artms-staging-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    ports:
+      - "9002:9000"
+      - "9003:9001"
+    volumes:
+      - staging_minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+
+  # ─────────────────────────────────────────
+  # ARTMS API (Staging Service)
+  # ─────────────────────────────────────────
+  api:
+    build:
+      context: ./backend/ssama-api
+      dockerfile: Dockerfile
+    container_name: artms-staging-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: staging
+      DB_URL: jdbc:postgresql://postgres:5432/artms_staging
+      DB_USERNAME: artms_staging
+      DB_PASSWORD: artms_staging_secret
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: artms-staging-docs
+      S3_ACCESS_KEY: minioadmin
+      S3_SECRET_KEY: minioadmin123
+      JWT_SECRET: "staging-super-secret-key-must-be-very-long-and-secure-12345678"
+      SWAGGER_ENABLED: "true"
+      LOG_LEVEL_APP: INFO
+    ports:
+      - "8081:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
+
+volumes:
+  staging_postgres_data:
+  staging_redis_data:
+  staging_minio_data:
+
+networks:
+  default:
+    name: artms-staging-network
