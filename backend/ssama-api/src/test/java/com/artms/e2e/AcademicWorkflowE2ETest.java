@@ -107,7 +107,7 @@ class AcademicWorkflowE2ETest extends IntegrationTestBase {
         gradingScheme.setTenantId(tenant.getId());
         gradingScheme.setName("E2E Standard Scheme");
         gradingScheme.setStatus(GradingSchemeStatus.ACTIVE);
-        gradingScheme.setRoundingMode(RoundingMode.HALF_UP);
+        gradingScheme.setGpaRounding(RoundingMode.HALF_UP);
         gradingScheme = gradingSchemeRepository.save(gradingScheme);
     }
 
@@ -157,9 +157,9 @@ class AcademicWorkflowE2ETest extends IntegrationTestBase {
         SubmitAttendanceRequest attendanceReq = new SubmitAttendanceRequest(
                 classGroup.getId(),
                 null,
-                null,
                 LocalDate.now(),
                 "P1",
+                null,
                 List.of(new AttendanceEntryDto(student.getId(), AttendanceStatus.PRESENT, "On time"))
         );
         var attendanceSession = attendanceService.submitAttendance(tenant.getId(), attendanceReq);
@@ -173,6 +173,6 @@ class AcademicWorkflowE2ETest extends IntegrationTestBase {
                 tenant.getId(), student.getId(), LocalDate.now().minusDays(1), LocalDate.now().plusDays(1));
         assertThat(summary.totalSessions()).isEqualTo(1);
         assertThat(summary.presentCount()).isEqualTo(1);
-        assertThat(summary.percentage().doubleValue()).isEqualTo(100.0);
+        assertThat(summary.attendancePercentage().doubleValue()).isEqualTo(100.0);
     }
 }
