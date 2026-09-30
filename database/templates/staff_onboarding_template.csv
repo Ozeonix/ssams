@@ -1,0 +1,9 @@
+employee_code,first_name,last_name,designation,department_code,role,gender,phone,email,qualification,assigned_grades,assigned_subjects
+EMP-001,Madhav,Adhikari,Principal,SEC_DEPT,INSTITUTION_ADMIN,MALE,+977-9851000001,principal@susanskrit.edu.np,Ph.D. Education Administration,"Grade 9, Grade 10",Supervision
+EMP-002,Shanta,Ghimire,Vice Principal,SEC_DEPT,INSTITUTION_ADMIN,FEMALE,+977-9851000002,viceprincipal@susanskrit.edu.np,M.Sc. Mathematics,"Grade 10, Grade 11",Compulsory Mathematics
+EMP-003,Deepak,Pokhrel,Head Accountant,SEC_DEPT,ACCOUNTANT,MALE,+977-9851000003,accounts@susanskrit.edu.np,M.B.S. Finance & Accounts,All,Fee & Financial Operations
+EMP-004,Narayan,Bhattarai,Examination Controller,SEC_DEPT,EXAM_CONTROLLER,MALE,+977-9851000004,exam@susanskrit.edu.np,M.Ed. Curriculum & Evaluation,All,CDC/NEB Exam Administration
+EMP-005,Ramesh,Kandel,Senior Science Teacher,SEC_DEPT,TEACHER,MALE,+977-9851000014,teacher.g10@susanskrit.edu.np,M.Sc. Physics (T.U.),"Grade 9, Grade 10",Science and Technology
+EMP-006,Saraswati,Acharya,Senior English Faculty,SEC_DEPT,TEACHER,FEMALE,+977-9851000006,saraswati.acharya@susanskrit.edu.np,M.A. English Literature,"Grade 10, Grade 11",Compulsory English
+EMP-007,Prakash,Basnet,Computer & IT Faculty,SEC_DEPT,TEACHER,MALE,+977-9851000007,prakash.basnet@susanskrit.edu.np,B.Sc. CSIT,"Grade 9, Grade 10, Grade 11",Optional Computer Science
+EMP-008,Krishna,Upadhyaya,Nepali & Social Faculty,SEC_DEPT,TEACHER,MALE,+977-9851000008,krishna.upadhyaya@susanskrit.edu.np,M.A. Nepali,"Grade 9, Grade 10",Compulsory Nepali / Social Studies

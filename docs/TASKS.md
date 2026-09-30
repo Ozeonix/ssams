@@ -154,3 +154,8 @@
 - [x] Flyway migration V8 (`V8__fee_payment_system.sql`).
 - [x] Payment subsystem unit & gateway verification tests.
 - [x] Payment documentation suite (`docs/*PAYMENT*`, `docs/ESEWA_INTEGRATION.md`).
+
+## School Commercial Readiness & Handover
+- [x] Shree Susanskrit Secondary School production seed dataset (`database/seeds/susanskrit_secondary_school_seed.sql`).
+- [x] Student & staff CSV batch onboarding kit with formatting validation guide (`database/templates/`).
+- [x] School commercial pitch, production deployment & operational handover guide (`docs/SCHOOL_DEPLOYMENT_HANDOVER.md`).
