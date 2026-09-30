@@ -1,0 +1,8 @@
+# SSAMS Student Mobile App - Keystore Configuration Example
+# Copy this file to 'key.properties' in mobile/ssams-student/android/ and update with your production keystore details.
+# DO NOT commit the actual key.properties or .jks file to Git.
+
+keyAlias=upload
+keyPassword=YourSecureKeyPasswordHere
+storeFile=/home/ozeonix/keystores/ssams-upload-keystore.jks
+storePassword=YourSecureStorePasswordHere

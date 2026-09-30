@@ -159,3 +159,5 @@
 - [x] Shree Susanskrit Secondary School production seed dataset (`database/seeds/susanskrit_secondary_school_seed.sql`).
 - [x] Student & staff CSV batch onboarding kit with formatting validation guide (`database/templates/`).
 - [x] School commercial pitch, production deployment & operational handover guide (`docs/SCHOOL_DEPLOYMENT_HANDOVER.md`).
+- [x] Automated batch onboarding CSV importer script with validation (`database/scripts/import_onboarding_batch.py`).
+- [x] Mobile app production release build & distribution guide (`docs/MOBILE_RELEASE_AND_DISTRIBUTION.md`).
