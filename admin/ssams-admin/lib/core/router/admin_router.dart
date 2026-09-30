@@ -6,6 +6,7 @@ import 'package:ssams_admin/features/attendance/presentation/attendance_screen.d
 import 'package:ssams_admin/features/auth/presentation/login_screen.dart';
 import 'package:ssams_admin/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:ssams_admin/features/exams/presentation/exams_screen.dart';
+import 'package:ssams_admin/features/payments/presentation/payments_screen.dart';
 import 'package:ssams_admin/features/settings/presentation/settings_screen.dart';
 import 'package:ssams_admin/features/shell/presentation/admin_shell.dart';
 import 'package:ssams_admin/features/students/presentation/students_screen.dart';
@@ -50,6 +51,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/attendance',
             builder: (context, state) => const AttendanceScreen(),
+          ),
+          GoRoute(
+            path: '/payments',
+            builder: (context, state) => const PaymentsScreen(),
           ),
           GoRoute(
             path: '/settings',

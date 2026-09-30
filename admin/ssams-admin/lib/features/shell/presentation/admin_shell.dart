@@ -15,7 +15,8 @@ class AdminShell extends ConsumerWidget {
     if (location.startsWith('/students')) return 2;
     if (location.startsWith('/exams')) return 3;
     if (location.startsWith('/attendance')) return 4;
-    if (location.startsWith('/settings')) return 5;
+    if (location.startsWith('/payments')) return 5;
+    if (location.startsWith('/settings')) return 6;
     return 0;
   }
 
@@ -37,6 +38,9 @@ class AdminShell extends ConsumerWidget {
         context.go('/attendance');
         break;
       case 5:
+        context.go('/payments');
+        break;
+      case 6:
         context.go('/settings');
         break;
     }
@@ -164,6 +168,11 @@ class AdminShell extends ConsumerWidget {
                 icon: Icon(Icons.fact_check_outlined),
                 selectedIcon: Icon(Icons.fact_check_rounded),
                 label: Text('Attendance'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.payments_outlined),
+                selectedIcon: Icon(Icons.payments_rounded),
+                label: Text('Payments'),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.settings_outlined),

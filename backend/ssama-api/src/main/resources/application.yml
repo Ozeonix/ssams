@@ -146,3 +146,13 @@ logging:
     org.hibernate.SQL: WARN
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level [%X{requestId}] [%X{tenantId}] %logger{36} - %msg%n"
+
+# ── eSewa Payment Gateway ───────────────────────────────────────────────────
+esewa:
+  environment: ${ESEWA_ENVIRONMENT:SANDBOX}
+  merchant-id: ${ESEWA_MERCHANT_ID:EPAYTEST}
+  # NEVER commit real secret key – use env var in production
+  secret-key: ${ESEWA_SECRET_KEY:8gBm/:&EnhH.1/q}
+
+app:
+  base-url: ${APP_BASE_URL:http://localhost:8080}

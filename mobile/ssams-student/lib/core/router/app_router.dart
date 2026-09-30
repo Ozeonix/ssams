@@ -7,10 +7,12 @@ import 'package:ssams_student/features/results/presentation/results_screen.dart'
 import 'package:ssams_student/features/attendance/presentation/attendance_screen.dart';
 import 'package:ssams_student/features/academics/presentation/academics_screen.dart';
 import 'package:ssams_student/features/profile/presentation/profile_screen.dart';
+import 'package:ssams_student/features/payment/presentation/fee_overview_screen.dart';
+import 'package:ssams_student/features/payment/presentation/invoice_detail_screen.dart';
+import 'package:ssams_student/features/payment/presentation/payment_history_screen.dart';
 import 'package:ssams_student/core/auth/auth_state_notifier.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final authNotifier = ref.watch(authStateProvider.notifier);
   final authState = ref.watch(authStateProvider);
 
   return GoRouter(
@@ -50,6 +52,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/profile',
             builder: (context, state) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: '/fees',
+            builder: (context, state) => const FeeOverviewScreen(),
+          ),
+          GoRoute(
+            path: '/fees/history',
+            builder: (context, state) => const PaymentHistoryScreen(),
+          ),
+          GoRoute(
+            path: '/fees/invoices/:id',
+            builder: (context, state) => InvoiceDetailScreen(
+              invoiceId: state.pathParameters['id']!,
+            ),
           ),
         ],
       ),
