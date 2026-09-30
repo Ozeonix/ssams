@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
  * New gateways auto-register via Spring DI – no code change required in the fee service.
  */
 @Component
-@RequiredArgsConstructor
 public class PaymentGatewayRegistry {
 
     private final Map<String, PaymentGateway> gatewayMap;

@@ -161,3 +161,11 @@
 - [x] School commercial pitch, production deployment & operational handover guide (`docs/SCHOOL_DEPLOYMENT_HANDOVER.md`).
 - [x] Automated batch onboarding CSV importer script with validation (`database/scripts/import_onboarding_batch.py`).
 - [x] Mobile app production release build & distribution guide (`docs/MOBILE_RELEASE_AND_DISTRIBUTION.md`).
+
+## 50k Concurrent Users Scalability & Performance
+- [x] Java 21 Virtual Threads & Tomcat high-concurrency tuning (`application.yml`, `application-prod.yml`).
+- [x] Redis L2 caching subsystem with custom TTLs & cache eviction (`CacheConfig.java`, `pom.xml`).
+- [x] PgBouncer connection pooler integration & PostgreSQL 16 high-load kernel tuning (`pgbouncer.ini`, `postgresql.conf`, `docker-compose.production.yml`).
+- [x] Nginx ingress high-concurrency event loop, upstream keepalive, and microcaching (`nginx.conf`).
+- [x] 50k Concurrent Virtual Users k6 benchmark suite (`tests/load/k6_50k_concurrent_benchmark.js`).
+- [x] 50k High-Concurrency Architecture & Capacity Blueprint documentation (`docs/SCALABILITY_50K_ARCHITECTURE.md`).

@@ -65,6 +65,9 @@ class AcademicWorkflowE2ETest extends IntegrationTestBase {
     @Autowired
     private AttendanceService attendanceService;
 
+    @Autowired
+    private com.artms.identity.domain.UserAccountRepository userAccountRepository;
+
     private Tenant tenant;
     private AcademicYear academicYear;
     private Program program;
@@ -79,7 +82,14 @@ class AcademicWorkflowE2ETest extends IntegrationTestBase {
         tenant.setStatus(TenantStatus.ACTIVE);
         tenant = tenantRepository.save(tenant);
 
-        TenantContext.set(tenant.getId(), UUID.randomUUID());
+        com.artms.identity.domain.UserAccount actor = new com.artms.identity.domain.UserAccount();
+        String uid = UUID.randomUUID().toString().substring(0, 8);
+        actor.setUsername("e2e_actor_" + uid);
+        actor.setEmail("e2e_" + uid + "@example.com");
+        actor.setPasswordHash("dummy_hash");
+        actor = userAccountRepository.save(actor);
+
+        TenantContext.set(tenant.getId(), actor.getId());
 
         academicYear = new AcademicYear();
         academicYear.setTenantId(tenant.getId());

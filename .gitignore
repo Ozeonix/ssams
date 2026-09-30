@@ -16,6 +16,8 @@ backend/ssama-api/.mvn/
 .env.local
 .env.*.local
 **/.env
+infrastructure/docker/pgbouncer/userlist.txt
+!infrastructure/docker/pgbouncer/userlist.txt.example
 
 # ─────────────────────────────────
 # Flutter / Dart

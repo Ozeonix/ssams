@@ -111,6 +111,42 @@ services:
           memory: 2G
 
   # ──────────────────────────────────────────────────────────────────────────
+  # PgBouncer Connection Pooler (Transaction Pooling for 50k Concurrent Users)
+  # ──────────────────────────────────────────────────────────────────────────
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    container_name: artms-prod-pgbouncer
+    <<: *default-restart
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      POOL_MODE: transaction
+      MAX_CLIENT_CONN: 10000
+      DEFAULT_POOL_SIZE: 50
+    volumes:
+      - ./infrastructure/docker/pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini:ro
+    networks:
+      - db_net
+      - api_net
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h localhost -p 6432 -U ${DB_USERNAME} -d ${DB_NAME} || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  # ──────────────────────────────────────────────────────────────────────────
   # Redis  (internal only)
   # ──────────────────────────────────────────────────────────────────────────
   redis:

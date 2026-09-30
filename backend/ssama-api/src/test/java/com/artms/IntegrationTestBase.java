@@ -14,15 +14,18 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * All tests share the same container lifecycle (STATIC).
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Testcontainers
 @ActiveProfiles("test")
 public abstract class IntegrationTestBase {
 
-    @Container
-    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine")
-            .withDatabaseName("artms_test")
-            .withUsername("artms_test")
-            .withPassword("artms_test");
+    static final PostgreSQLContainer<?> postgres;
+
+    static {
+        postgres = new PostgreSQLContainer<>("postgres:16-alpine")
+                .withDatabaseName("artms_test")
+                .withUsername("artms_test")
+                .withPassword("artms_test");
+        postgres.start();
+    }
 
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {

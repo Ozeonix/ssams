@@ -1,0 +1,2 @@
+"postgres" "md5_or_scram_hashed_password"
+"artms_prod_user" "md5_or_scram_hashed_password"

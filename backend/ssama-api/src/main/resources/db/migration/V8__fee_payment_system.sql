@@ -27,7 +27,7 @@ CREATE TABLE fee_structure (
     fee_category_id  UUID         NOT NULL REFERENCES fee_category(id),
     academic_year_id UUID         REFERENCES academic_year(id),
     program_id       UUID         REFERENCES program(id),        -- NULL = applies to all
-    class_section_id UUID         REFERENCES class_section(id),  -- NULL = applies to all sections
+    class_section_id UUID         REFERENCES class_group(id),    -- NULL = applies to all sections
     amount           NUMERIC(12,2) NOT NULL CHECK (amount >= 0),
     due_date         DATE,
     late_fee_per_day NUMERIC(8,2) DEFAULT 0,
@@ -304,19 +304,19 @@ CREATE INDEX idx_payment_audit_tenant ON payment_audit_log (tenant_id, occurred_
 -- ============================================================
 -- ADD PAYMENT PERMISSIONS (extend existing V6 seed)
 -- ============================================================
-INSERT INTO permission (code, description) VALUES
-    ('PERM_fee:manage',              'Create and manage fee structures'),
-    ('PERM_fee:read',                'Read fee structures and categories'),
-    ('PERM_invoice:create',          'Create fee invoices'),
-    ('PERM_invoice:read',            'Read fee invoices'),
-    ('PERM_invoice:cancel',          'Cancel fee invoices'),
-    ('PERM_payment:initiate',        'Initiate payment for own invoice'),
-    ('PERM_payment:read',            'Read payment transactions'),
-    ('PERM_payment:manage',          'Manage all payment transactions'),
-    ('PERM_receipt:read',            'Read payment receipts'),
-    ('PERM_refund:request',          'Request refund'),
-    ('PERM_refund:approve',          'Approve refund'),
-    ('PERM_reconciliation:manage',   'Run and manage reconciliation'),
-    ('PERM_gateway:configure',       'Configure payment gateway settings'),
-    ('PERM_ledger:read',             'Read student ledger entries')
+INSERT INTO permission (code, description, domain) VALUES
+    ('PERM_fee:manage',              'Create and manage fee structures',     'fee'),
+    ('PERM_fee:read',                'Read fee structures and categories',   'fee'),
+    ('PERM_invoice:create',          'Create fee invoices',                  'invoice'),
+    ('PERM_invoice:read',            'Read fee invoices',                    'invoice'),
+    ('PERM_invoice:cancel',          'Cancel fee invoices',                  'invoice'),
+    ('PERM_payment:initiate',        'Initiate payment for own invoice',     'payment'),
+    ('PERM_payment:read',            'Read payment transactions',            'payment'),
+    ('PERM_payment:manage',          'Manage all payment transactions',      'payment'),
+    ('PERM_receipt:read',            'Read payment receipts',                'receipt'),
+    ('PERM_refund:request',          'Request refund',                       'refund'),
+    ('PERM_refund:approve',          'Approve refund',                       'refund'),
+    ('PERM_reconciliation:manage',   'Run and manage reconciliation',        'reconciliation'),
+    ('PERM_gateway:configure',       'Configure payment gateway settings',   'gateway'),
+    ('PERM_ledger:read',             'Read student ledger entries',          'ledger')
 ON CONFLICT (code) DO NOTHING;

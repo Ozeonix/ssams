@@ -3,16 +3,21 @@ spring:
     activate:
       on-profile: prod
 
+  threads:
+    virtual:
+      enabled: true
+
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     hikari:
-      maximum-pool-size: ${DB_POOL_SIZE:50}
-      minimum-idle: 15
+      maximum-pool-size: ${DB_POOL_SIZE:60}
+      minimum-idle: 20
       connection-timeout: 15000
       idle-timeout: 300000
       max-lifetime: 1200000
+      leak-detection-threshold: 30000
 
   jpa:
     open-in-view: false
@@ -21,6 +26,12 @@ spring:
     properties:
       hibernate:
         format_sql: false
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000ms
+      cache-null-values: false
 
   flyway:
     enabled: true
@@ -35,10 +46,24 @@ spring:
       timeout: 2000ms
       ssl:
         enabled: ${REDIS_SSL_ENABLED:true}
+      lettuce:
+        pool:
+          max-active: 50
+          max-idle: 25
+          min-idle: 10
 
 server:
   port: ${SERVER_PORT:8080}
   forward-headers-strategy: framework
+  tomcat:
+    threads:
+      max: ${TOMCAT_MAX_THREADS:300}
+      min-spare: ${TOMCAT_MIN_SPARE_THREADS:30}
+    max-connections: ${TOMCAT_MAX_CONNECTIONS:50000}
+    accept-count: ${TOMCAT_ACCEPT_COUNT:2000}
+    connection-timeout: 20000
+    max-keep-alive-requests: 10000
+    keep-alive-timeout: 60000
   error:
     include-message: never
     include-stacktrace: never
