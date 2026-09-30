@@ -462,6 +462,241 @@ VALUES
 ON CONFLICT (code) DO NOTHING;
 
 -- ============================================================================
+-- V8: STUDENT FEE & PAYMENT SYSTEM
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS fee_category (
+    id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id   UUID        NOT NULL REFERENCES tenant(id),
+    code        VARCHAR(64) NOT NULL,
+    name        VARCHAR(128) NOT NULL,
+    description VARCHAR(512),
+    is_active   BOOLEAN     NOT NULL DEFAULT true,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (tenant_id, code)
+);
+CREATE INDEX IF NOT EXISTS idx_fee_category_tenant ON fee_category (tenant_id, is_active);
+
+CREATE TABLE IF NOT EXISTS fee_structure (
+    id               UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id        UUID         NOT NULL REFERENCES tenant(id),
+    fee_category_id  UUID         NOT NULL REFERENCES fee_category(id),
+    academic_year_id UUID         REFERENCES academic_year(id),
+    program_id       UUID         REFERENCES program(id),
+    class_section_id UUID         REFERENCES class_section(id),
+    amount           NUMERIC(12,2) NOT NULL CHECK (amount >= 0),
+    due_date         DATE,
+    late_fee_per_day NUMERIC(8,2) DEFAULT 0,
+    is_active        BOOLEAN      NOT NULL DEFAULT true,
+    created_by       UUID         REFERENCES user_account(id),
+    created_at       TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    updated_at       TIMESTAMPTZ  NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_fee_structure_tenant    ON fee_structure (tenant_id, is_active);
+CREATE INDEX IF NOT EXISTS idx_fee_structure_acad_year ON fee_structure (tenant_id, academic_year_id);
+
+CREATE TABLE IF NOT EXISTS fee_invoice (
+    id               UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    invoice_number   VARCHAR(64)  NOT NULL UNIQUE,
+    tenant_id        UUID         NOT NULL REFERENCES tenant(id),
+    student_id       UUID         NOT NULL REFERENCES student(id),
+    academic_year_id UUID         REFERENCES academic_year(id),
+    invoice_date     DATE         NOT NULL DEFAULT CURRENT_DATE,
+    due_date         DATE,
+    subtotal         NUMERIC(12,2) NOT NULL DEFAULT 0,
+    discount_amount  NUMERIC(12,2) NOT NULL DEFAULT 0,
+    late_fee_amount  NUMERIC(12,2) NOT NULL DEFAULT 0,
+    total_amount     NUMERIC(12,2) NOT NULL DEFAULT 0,
+    paid_amount      NUMERIC(12,2) NOT NULL DEFAULT 0,
+    balance          NUMERIC(12,2) NOT NULL DEFAULT 0,
+    status           VARCHAR(32)  NOT NULL DEFAULT 'DRAFT',
+    notes            TEXT,
+    issued_by        UUID         REFERENCES user_account(id),
+    issued_at        TIMESTAMPTZ,
+    created_at       TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    updated_at       TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    CONSTRAINT fee_invoice_status_chk CHECK (
+        status IN ('DRAFT','ISSUED','PARTIALLY_PAID','PAID','OVERDUE','CANCELLED')
+    ),
+    CONSTRAINT fee_invoice_balance_chk CHECK (balance >= 0),
+    CONSTRAINT fee_invoice_paid_chk    CHECK (paid_amount >= 0),
+    CONSTRAINT fee_invoice_total_chk   CHECK (total_amount >= 0)
+);
+CREATE INDEX IF NOT EXISTS idx_fee_invoice_student ON fee_invoice (student_id, status);
+CREATE INDEX IF NOT EXISTS idx_fee_invoice_tenant  ON fee_invoice (tenant_id, status, due_date);
+CREATE INDEX IF NOT EXISTS idx_fee_invoice_number  ON fee_invoice (invoice_number);
+
+CREATE TABLE IF NOT EXISTS fee_invoice_item (
+    id              UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    invoice_id      UUID         NOT NULL REFERENCES fee_invoice(id) ON DELETE CASCADE,
+    fee_category_id UUID         NOT NULL REFERENCES fee_category(id),
+    description     VARCHAR(512),
+    quantity        INTEGER      NOT NULL DEFAULT 1,
+    unit_amount     NUMERIC(12,2) NOT NULL,
+    total_amount    NUMERIC(12,2) NOT NULL,
+    created_at      TIMESTAMPTZ  NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_invoice_item_invoice ON fee_invoice_item (invoice_id);
+
+CREATE TABLE IF NOT EXISTS payment_gateway_config (
+    id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id       UUID        NOT NULL REFERENCES tenant(id),
+    gateway_code    VARCHAR(64) NOT NULL,
+    display_name    VARCHAR(128) NOT NULL,
+    environment     VARCHAR(32) NOT NULL DEFAULT 'SANDBOX',
+    merchant_id     VARCHAR(256),
+    config_json     JSONB,
+    is_active       BOOLEAN     NOT NULL DEFAULT false,
+    created_by      UUID        REFERENCES user_account(id),
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (tenant_id, gateway_code),
+    CONSTRAINT gateway_environment_chk CHECK (environment IN ('SANDBOX','PRODUCTION'))
+);
+CREATE INDEX IF NOT EXISTS idx_gateway_config_tenant ON payment_gateway_config (tenant_id, is_active);
+
+CREATE TABLE IF NOT EXISTS payment_transaction (
+    id                  UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    transaction_ref     VARCHAR(128) NOT NULL UNIQUE,
+    tenant_id           UUID         NOT NULL REFERENCES tenant(id),
+    student_id          UUID         NOT NULL REFERENCES student(id),
+    invoice_id          UUID         NOT NULL REFERENCES fee_invoice(id),
+    gateway_code        VARCHAR(64)  NOT NULL DEFAULT 'ESEWA',
+    amount              NUMERIC(12,2) NOT NULL CHECK (amount > 0),
+    currency            VARCHAR(8)   NOT NULL DEFAULT 'NPR',
+    status              VARCHAR(32)  NOT NULL DEFAULT 'CREATED',
+    gateway_order_id    VARCHAR(256),
+    gateway_txn_ref     VARCHAR(256),
+    gateway_response    JSONB,
+    initiated_at        TIMESTAMPTZ,
+    completed_at        TIMESTAMPTZ,
+    expired_at          TIMESTAMPTZ,
+    failure_reason      VARCHAR(512),
+    initiated_by_user   UUID         REFERENCES user_account(id),
+    created_at          TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    updated_at          TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    CONSTRAINT payment_txn_status_chk CHECK (
+        status IN ('CREATED','INITIATED','PENDING','SUCCESS','FAILED','CANCELLED','EXPIRED','REFUND_PENDING','REFUNDED')
+    )
+);
+CREATE INDEX IF NOT EXISTS idx_payment_txn_student ON payment_transaction (student_id, status);
+CREATE INDEX IF NOT EXISTS idx_payment_txn_invoice ON payment_transaction (invoice_id, status);
+CREATE INDEX IF NOT EXISTS idx_payment_txn_ref     ON payment_transaction (transaction_ref);
+
+CREATE TABLE IF NOT EXISTS student_ledger_entry (
+    id              UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id       UUID         NOT NULL REFERENCES tenant(id),
+    student_id      UUID         NOT NULL REFERENCES student(id),
+    invoice_id      UUID         REFERENCES fee_invoice(id),
+    transaction_id  UUID         REFERENCES payment_transaction(id),
+    entry_type      VARCHAR(32)  NOT NULL,
+    amount          NUMERIC(12,2) NOT NULL,
+    description     VARCHAR(512),
+    reference       VARCHAR(128),
+    balance_after   NUMERIC(12,2) NOT NULL,
+    created_by      UUID         REFERENCES user_account(id),
+    created_at      TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    CONSTRAINT ledger_entry_type_chk CHECK (
+        entry_type IN ('CHARGE','PAYMENT','ADJUSTMENT','DISCOUNT','LATE_FEE','REFUND','REVERSAL')
+    )
+);
+CREATE INDEX IF NOT EXISTS idx_ledger_student ON student_ledger_entry (student_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS payment_receipt (
+    id              UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    receipt_number  VARCHAR(64)  NOT NULL UNIQUE,
+    tenant_id       UUID         NOT NULL REFERENCES tenant(id),
+    transaction_id  UUID         NOT NULL UNIQUE REFERENCES payment_transaction(id),
+    student_id      UUID         NOT NULL REFERENCES student(id),
+    invoice_id      UUID         NOT NULL REFERENCES fee_invoice(id),
+    amount          NUMERIC(12,2) NOT NULL,
+    payment_method  VARCHAR(64)  NOT NULL DEFAULT 'ESEWA',
+    gateway_ref     VARCHAR(256),
+    issued_at       TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    receipt_data    JSONB        NOT NULL DEFAULT '{}'
+);
+CREATE INDEX IF NOT EXISTS idx_receipt_student     ON payment_receipt (student_id);
+CREATE INDEX IF NOT EXISTS idx_receipt_transaction ON payment_receipt (transaction_id);
+CREATE INDEX IF NOT EXISTS idx_receipt_number      ON payment_receipt (receipt_number);
+
+CREATE TABLE IF NOT EXISTS refund (
+    id              UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id       UUID         NOT NULL REFERENCES tenant(id),
+    transaction_id  UUID         NOT NULL REFERENCES payment_transaction(id),
+    student_id      UUID         NOT NULL REFERENCES student(id),
+    invoice_id      UUID         REFERENCES fee_invoice(id),
+    amount          NUMERIC(12,2) NOT NULL CHECK (amount > 0),
+    reason          TEXT         NOT NULL,
+    status          VARCHAR(32)  NOT NULL DEFAULT 'PENDING',
+    requested_by    UUID         NOT NULL REFERENCES user_account(id),
+    approved_by     UUID         REFERENCES user_account(id),
+    gateway_ref     VARCHAR(256),
+    notes           TEXT,
+    requested_at    TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    approved_at     TIMESTAMPTZ,
+    processed_at    TIMESTAMPTZ,
+    CONSTRAINT refund_status_chk CHECK (
+        status IN ('PENDING','APPROVED','PROCESSING','COMPLETED','REJECTED','CANCELLED')
+    )
+);
+CREATE INDEX IF NOT EXISTS idx_refund_transaction ON refund (transaction_id);
+CREATE INDEX IF NOT EXISTS idx_refund_student     ON refund (student_id, status);
+
+CREATE TABLE IF NOT EXISTS reconciliation_batch (
+    id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id       UUID        NOT NULL REFERENCES tenant(id),
+    gateway_code    VARCHAR(64) NOT NULL,
+    period_from     DATE        NOT NULL,
+    period_to       DATE        NOT NULL,
+    status          VARCHAR(32) NOT NULL DEFAULT 'PENDING',
+    total_gateway   INTEGER     DEFAULT 0,
+    total_local     INTEGER     DEFAULT 0,
+    matched         INTEGER     DEFAULT 0,
+    mismatched      INTEGER     DEFAULT 0,
+    missing_local   INTEGER     DEFAULT 0,
+    missing_gateway INTEGER     DEFAULT 0,
+    initiated_by    UUID        REFERENCES user_account(id),
+    completed_at    TIMESTAMPTZ,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT recon_status_chk CHECK (status IN ('PENDING','RUNNING','COMPLETED','FAILED'))
+);
+CREATE INDEX IF NOT EXISTS idx_recon_batch_tenant ON reconciliation_batch (tenant_id, period_from);
+
+CREATE TABLE IF NOT EXISTS reconciliation_item (
+    id                  UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    batch_id            UUID        NOT NULL REFERENCES reconciliation_batch(id) ON DELETE CASCADE,
+    transaction_id      UUID        REFERENCES payment_transaction(id),
+    gateway_txn_ref     VARCHAR(256),
+    local_amount        NUMERIC(12,2),
+    gateway_amount      NUMERIC(12,2),
+    reconciliation_status VARCHAR(32) NOT NULL DEFAULT 'PENDING',
+    notes               TEXT,
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT recon_item_status_chk CHECK (
+        reconciliation_status IN ('MATCHED','AMOUNT_MISMATCH','MISSING_LOCAL','MISSING_GATEWAY','DUPLICATE','PENDING')
+    )
+);
+CREATE INDEX IF NOT EXISTS idx_recon_item_batch ON reconciliation_item (batch_id, reconciliation_status);
+
+INSERT INTO permission (code, description) VALUES
+    ('PERM_fee:manage',              'Create and manage fee structures'),
+    ('PERM_fee:read',                'Read fee structures and categories'),
+    ('PERM_invoice:create',          'Create fee invoices'),
+    ('PERM_invoice:read',            'Read fee invoices'),
+    ('PERM_invoice:cancel',          'Cancel fee invoices'),
+    ('PERM_payment:initiate',        'Initiate payment for own invoice'),
+    ('PERM_payment:read',            'Read payment transactions'),
+    ('PERM_payment:manage',          'Manage all payment transactions'),
+    ('PERM_receipt:read',            'Read payment receipts'),
+    ('PERM_refund:request',          'Request refund'),
+    ('PERM_refund:approve',          'Approve refund'),
+    ('PERM_reconciliation:manage',   'Run and manage reconciliation'),
+    ('PERM_gateway:configure',       'Configure payment gateway settings'),
+    ('PERM_ledger:read',             'Read student ledger entries')
+ON CONFLICT (code) DO NOTHING;
+
+-- ============================================================================
 -- Flyway metadata stub (skip if using Flyway directly)
 -- ============================================================================
 -- If applying this script to a database that Flyway will later manage,
@@ -471,6 +706,6 @@ ON CONFLICT (code) DO NOTHING;
 --       installed_rank, version, description, type, script,
 --       checksum, installed_by, execution_time, success
 --   ) VALUES (
---       1, '7', 'Standalone baseline', 'BASELINE', 'standalone_schema_sync.sql',
+--       1, '8', 'Standalone baseline', 'BASELINE', 'standalone_schema_sync.sql',
 --       0, current_user, 0, true
 --   ) ON CONFLICT DO NOTHING;

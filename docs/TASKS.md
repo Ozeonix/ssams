@@ -135,3 +135,22 @@
 - [x] Staging database PII anonymization & masking utility.
 - [x] Automated database maintenance script (VACUUM, REINDEX, bloat check).
 - [x] Legacy marksheet migration CSV template & parser.
+
+## Fees & Payments
+- [x] Fee category management (configurable by tenant).
+- [x] Fee structures (amounts per academic year & program).
+- [x] Invoice generation, calculation & state machine.
+- [x] Payment gateway abstraction layer (`PaymentGateway`).
+- [x] eSewa V2 integration with HMAC-SHA256 signature verification.
+- [x] Server-side payment verification (zero client trust).
+- [x] Idempotent payment processing & race condition handling.
+- [x] Partial payment support & ledger allocation.
+- [x] Immutable student financial ledger (`StudentLedgerEntry`).
+- [x] Reproducible payment receipt generation.
+- [x] Student payment history & fee overview (Flutter mobile app).
+- [x] Admin fee & payment management dashboard (Flutter web portal).
+- [x] eSewa batch reconciliation engine & statement audit.
+- [x] Refund data model & RBAC approval flow.
+- [x] Flyway migration V8 (`V8__fee_payment_system.sql`).
+- [x] Payment subsystem unit & gateway verification tests.
+- [x] Payment documentation suite (`docs/*PAYMENT*`, `docs/ESEWA_INTEGRATION.md`).
