@@ -112,7 +112,7 @@ DECLARE
 
     -- Standard demo password hash for 'Susanskrit@2083' (or default dev pass)
     -- Hash matches Argon2id encoder in SSAMS Authentication Subsystem
-    v_demo_pass   TEXT := '$argon2id$v=19$m=65536,t=3,p=1$c29tZXNhbHQ$abcdefghijklmnopqrstuvwxyz1234567890';
+    v_demo_pass   TEXT := '$argon2id$v=19$m=65536,t=3,p=1$EjRuray99l6+a7Xm7jElJw$+kyQjnkaZOtuNjz9KpHnq8Q0XHpcFutKiHTJYigV7Uk';
 
 BEGIN
     -- --------------------------------------------------------------------------

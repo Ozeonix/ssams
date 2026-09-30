@@ -43,7 +43,7 @@ from pathlib import Path
 # Defaults
 DEFAULT_TENANT_ID = "e1000000-0000-0000-0000-000000000001"
 DEFAULT_AY_ID = "e1000000-0000-0000-0000-000000000002"
-DEFAULT_PASS_HASH = "$argon2id$v=19$m=65536,t=3,p=1$c29tZXNhbHQ$abcdefghijklmnopqrstuvwxyz1234567890"
+DEFAULT_PASS_HASH = "$argon2id$v=19$m=65536,t=3,p=1$EjRuray99l6+a7Xm7jElJw$+kyQjnkaZOtuNjz9KpHnq8Q0XHpcFutKiHTJYigV7Uk"
 
 # Allowed enums
 VALID_GENDERS = {"MALE", "FEMALE", "OTHER"}

@@ -124,11 +124,11 @@ BEGIN
     ON CONFLICT DO NOTHING;
 
     -- 10. PILOT USER ACCOUNTS & MEMBERSHIPS
-    -- Password hash for: 'PilotPass123!' (Argon2id dummy hash compliant with system)
+    -- Password hash for: 'PilotPass123!' (Argon2id compliant with Spring Security v5.8)
     INSERT INTO user_account (id, username, email, password_hash, status)
     VALUES 
-        (v_admin_uid, 'pilot_admin', 'admin@pilot-hma.edu.np', '$argon2id$v=19$m=65536,t=3,p=1$c29tZXNhbHQ$abcdefghijklmnopqrstuvwxyz1234567890', 'ACTIVE'),
-        (v_teach_uid, 'pilot_teacher', 'teacher@pilot-hma.edu.np', '$argon2id$v=19$m=65536,t=3,p=1$c29tZXNhbHQ$abcdefghijklmnopqrstuvwxyz1234567890', 'ACTIVE')
+        (v_admin_uid, 'pilot_admin', 'admin@pilot-hma.edu.np', '$argon2id$v=19$m=65536,t=3,p=1$WuIcFBI2KuKbJvw4fg3Sng$sTdfwibUbrUqsQbHiaYdpLDZAq3LQpTdshGwXxq+H/I', 'ACTIVE'),
+        (v_teach_uid, 'pilot_teacher', 'teacher@pilot-hma.edu.np', '$argon2id$v=19$m=65536,t=3,p=1$WuIcFBI2KuKbJvw4fg3Sng$sTdfwibUbrUqsQbHiaYdpLDZAq3LQpTdshGwXxq+H/I', 'ACTIVE')
     ON CONFLICT (username) DO NOTHING;
 
     INSERT INTO user_tenant_membership (id, tenant_id, user_id, status)
