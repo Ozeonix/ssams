@@ -40,8 +40,11 @@ class AuthRepository {
         username: data['user']['username'] as String,
       );
     } on DioException catch (e) {
+      if (e.response == null) {
+        throw LoginException('Unable to reach server. Please check connection and ADB port forwarding.');
+      }
       final body = e.response?.data;
-      final message = body is Map ? (body['message'] ?? 'Login failed') : 'Login failed';
+      final message = body is Map ? (body['message'] ?? body['error'] ?? 'Login failed') : 'Login failed';
       throw LoginException(message.toString());
     }
   }
